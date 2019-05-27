@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <!-- Anticachemeuk voor firebase -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <!--Import a-frame and aframe-animation-component-->
+    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-animation-component@^5.1.2/dist/aframe-animation-component.min.js"></script>
+
+    <!--Link JS file-->
+    <script src="static/js/main.js?t=2"></script>
+
+    <title>Prosect VR Testomgeving</title>
+</head>
+<body>
+    <a-scene stats debug>
+
+        <!--Asset management-->
+        <a-assets>
+            <img id="gereedschap" src="static/img/gereedschap.jpg"/>
+            <img id="muur" src="static/img/muur.jpg"/>
+            <img id="sky" src="static/img/sky.jpg"/>
+            <img id="insect" src="static/img/insect.jpg"/>
+            <img id="bamboe" src="static/img/bamboe.jpg"/>
+            <img id="hout" src="static/img/hout.jpg"/>
+            <img id="dennenappels" src="static/img/dennenappels.jpg"/>
+            <a-asset-item id="zaag" src="static/model/zaag.gltf"></a-asset-item>
+            <a-asset-item id="zaagmuur" src="static/model/zaag_transparant.gltf"></a-asset-item>
+            <a-asset-item id="hamer" src="static/model/hamer.gltf"></a-asset-item>
+            <a-asset-item id="hamermuur" src="static/model/hamerdoorzichtig.gltf"></a-asset-item>
+            <a-asset-item id="kniptang" src="static/model/kniptangheel.gltf"></a-asset-item>
+            <a-asset-item id="kniptangmuur" src="static/model/kniptangheel_transparant.gltf"></a-asset-item>
+            <a-mixin
+                id="highlight"
+                animation="property: color; from: #000000; to: #FFFFFF; dur: 1000; dir: alternate; easing: easeInOutSine; loop: true"
+                visible="false"
+            ></a-mixin>
+        </a-assets>
+
+        <!--Camera movement with separate entity-->
+        <a-entity id="js--camera">
+            <a-camera id="js--player" position="0 1.7 0">
+                <!--Cursor with fuse-->
+                <a-cursor id="js--cursor"
+                          geometry="primitive: ring; radiusOuter: 0.017; radiusInner: 0.01; thetaLength: 360; segmentsTheta: 12; segmentsPhi:1"
+                          material="color: lightgray;"
+                          position="0 0 -1"
+                          fuse="true"
+                          fuseTimeout="1000"></a-cursor>
+                <a-ring geometry="primitive: ring; radiusOuter: 0.02; radiusInner: 0.017; segmentsTheta: 12; segmentsPhi:1"
+                        material="color: black;"
+                        position="0 0 -1"></a-ring>
+                <a-ring geometry="primitive: ring; radiusOuter: 0.01; radiusInner: 0.007; segmentsTheta: 12; segmentsPhi:1"
+                        material="color: black;"
+                        position="0 0 -1"></a-ring>
+            </a-camera>
+        </a-entity>
+
+        <!--Movement points-->
+        <a-cylinder tp position="1 0 -2"></a-cylinder>
+        <a-cylinder tp position="1 0 -1"></a-cylinder>
+        <a-cylinder tp position="1 0 0"></a-cylinder>
+        <a-cylinder tp position="1 0 1"></a-cylinder>
+        <a-cylinder tp position="0 0 0"></a-cylinder>
+        <a-cylinder tp position="-1.5 0 -1.1"></a-cylinder>
+
+        <!--Floor and walls-->
+        <a-plane position="   0   0    0" rotation="-90   0 0" width="5" height="5" color="gray"><!-- Vloer -->
+
+        </a-plane>
+        <a-plane position="   0   3    0" rotation=" 90   0 0" width="5" height="5" color="gray"><!-- Dak -->
+
+        </a-plane>
+        <a-plane position="   0 1.5 -2.5" rotation="  0   0 0" width="5" height="3" src="#muur" ><!-- Voor -->
+            <!--Text explanation-->
+            <!-- <a-text color="black" value="Om dichterbij te komen kun je de zwarte rondjes op de vloer selecteren" position="0 1.9 -2" align="center" wrap-count="25" scale="0.2 0.2 0.2" geometry="primitive: plane; height: 2; width: auto;" material="color: white"></a-text> -->
+            <a-text id="js--watmoetjedoen"
+                color="black"
+                visible = "true"
+                value="Wat moet je doen:"
+                position="0 0.7 0.001"
+                align="center"
+                wrap-count="20"
+                width="6"
+                scale="0.2 0.2 0.2"
+                geometry="primitive: plane; height: 1.5; width: 10"
+                material="color: white"
+            ></a-text>
+            <a-text
+                id="js--instructie"
+                color="black"
+                value="1. Pak de zaag op en zaag 30cm van de onderste plank af"
+                position="0 0.2 0.001"
+                align="center"
+                wrap-count="20"
+                width="6"
+                scale="0.2 0.2 0.2"
+                geometry="primitive: plane; height: 6; width: 10"
+                material="color: white"
+            ></a-text>
+            <a-text
+                id="js--APIinsect"
+                color="black"
+                value=""
+                position="-1.7 0.3 0.001"
+                visible="false"
+                align="center"
+                wrap-count="20"
+                scale="0.2 0.2 0.2"
+                geometry="primitive: plane; height: 1; width: 5"
+                material="color: white"
+            > <a-plane
+                width=5
+                height=5
+                position="0 3 0.01">
+                </a-plane></a-text>
+            <a-entity position="0 -1.5 1">
+                <a-text id="js--stap1"  color="black" value="Stap 1"  position="2.1 1.2   0   " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="true"></a-text>
+                <a-text id="js--stap2"  color="black" value="Stap 2"  position="2.1 1.2  -0.6 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap3"  color="black" value="Stap 3"  position="2.1 1.8   2.75" align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap4"  color="black" value="Stap 4"  position="2.1 1.2   0.5 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap5"  color="black" value="Stap 5"  position="2.1 1.2   0.8 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap6"  color="black" value="Stap 6"  position="2.1 1.2   0.8 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap7"  color="black" value="Stap 7"  position="2.1 1.45  0.5 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap71" color="black" value="Stap 7"  position="2.1 1.45 -0.5 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap8"  color="black" value="Stap 8"  position="2   1.2   2.3 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap9"  color="black" value="Stap 9"  position="2   1.2   2.3 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap10" color="black" value="Stap 10" position="2.1 1.8   0.5 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap101"color="black" value="Stap 10" position="2.1 1.8  -0.5 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap11" color="black" value="Stap 11" position="2.3 1.2   2.3 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap12" color="black" value="Stap 12" position="2.3 1.2   2.3 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap13" color="black" value="Stap 13" position="2.3 1.2   1.6 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+                <a-text id="js--stap14" color="black" value="Stap 14" position="2.3 1.2   1.6 " align="center" wrap-count="20" width="5" scale="0.2 0.2 0.2" rotation= "0 -90 0" geometry="primitive: plane; height: 1; width: 2" material="color: white" visible="false"></a-text>
+            </a-entity>
+        </a-plane>
+        <a-plane position="-2.5 1.5    0" rotation="  0  90 0" width="5" height="3" src="#muur" ><!-- Links -->
+            <!-- Door -->
+            <a-box position="-1.5 -0.4 0.025" width="1" height="2.2" depth="0.05" color="#993300">
+                <!-- Deurklink -->
+                <a-box position="0.3 0 0.05" width="0.2" height="0.05" depth="0.05" color="grey"></a-box>
+            </a-box>
+            <!-- Window -->
+            <a-box position="1 0.1 0.025" width="1.8" height="1.2" depth="0.05" color="#993300">
+                <!-- Lucht -->
+                <a-box position="0 0 0.026" width="1.7" height="1.1" depth="0.001" src="#sky"></a-box>
+            </a-box>
+        </a-plane>
+        <a-plane position=" 2.5 1.5    0" rotation="  0 -90 0" width="5" height="3" src="#muur" ><!-- Rechts -->
+            <!--Gereedschapsrek -->
+            <a-entity id="js--gereedschapsrek" position="0.5 0.5a 0.025" rotation="0 90 0">
+                <a-box scale="0.05 1 2" position="0 0 0" src="#gereedschap"></a-box>
+                <a-gltf-model
+                    id="js--zaagmuur"
+                    src="#zaagmuur"
+                    position="-0.05 0.2 -0.2"
+                    rotation="90 0 0"
+                    scale="0.99 0.99 0.99"
+                ></a-gltf-model>
+                <a-gltf-model
+                    id="js--hamermuur"
+                    src="#hamermuur"
+                    position="0.19 0.2 0.499"
+                    rotation="90 -90 0"
+                    scale="0.39 0.39 0.39"
+                ></a-gltf-model>
+                <a-gltf-model
+                    id="js--kniptangmuur"
+                    src="#kniptangmuur"
+                    color="black"
+                    position="-0.025 -0.1 -0.5"
+                    rotation="0 0 0"
+                    scale="0.24 0.24 0.24"
+                ></a-gltf-model>
+
+                <!--Zaag-->
+                <a-gltf-model
+                    id="js--zaag"
+                    src="#zaag"
+                    position="-0.05 0.2 -0.2"
+                    rotation="90 0 0"
+                    animation="
+                        property: position;
+                        from: 0 0.3 2;
+                        to: 0 0.3 6;
+                        dur: 1000;
+                        dir: alternate;
+                        easing: easeInOutSine;
+                        loop: true;
+                        startEvents: bezigstart;
+                        pauseEvents: bezigstop;
+                    "
+                ></a-gltf-model>
+
+                <!-- Hamer-->
+                <a-gltf-model
+                    id="js--hamer"
+                    src="#hamer"
+                    position="0.19 0.2 0.499"
+                    rotation="90 -90 0"
+                    scale="0.4 0.4 0.4"
+                    animation__hameren="
+                        property: rotation;
+                        from: 0 0 0;
+                        to: 0 45 0;
+                        dur: 1000;
+                        dir: alternate;
+                        easing: easeInOutSine;
+                        loop: true;
+                        startEvents: bezigstart;
+                        pauseEvents: bezigstop;
+                    "
+                    animation__hameren2="
+                        property: position;
+                        from: -2.25 -3.15 -0.5;
+                        to: -7.25 -3.15 -0.5;
+                        dur: 1000;
+                        dir: alternate;
+                        easing: easeInOutSine;
+                        loop: true;
+                        startEvents: bezigstart;
+                        pauseEvents: bezigstop;
+                    "
+                ></a-gltf-model>
+
+                <!-- Kniptang -->
+                <a-gltf-model
+                    id="js--kniptang"
+                    src="#kniptang"
+                    position="-0.025 -0.1 -0.5"
+                    rotation="0 0 0"
+                    scale="0.25 0.25 0.25d"
+                    animation__knippen="
+                        property: position;
+                        from: -0.2 0 0.67;
+                        to: 0.1 0 0.67;
+                        dur: 8000;
+                        dir: alternate;
+                        easing: easeInOutSine;
+                        loop: true;
+                        startEvents: bezigstart;
+                        pauseEvents: bezigstop;
+                    "
+                ></a-gltf-model>
+            </a-entity>
+        </a-plane>
+        <a-plane position="   0 1.5  2.5" rotation="  0 180 0" width="5" height="3" src="#muur" ><!-- Achter -->
+            <!-- Kast -->
+            <a-box position="0.5 -0.4 0.25" width="1" height="2.2" depth="0.5" material="color: #993300;" line="start: 0 -1.1 0.25; end: 0 1.1 0.25; color: #331100">
+                <a-box position="-0.1 0 0.275" width="0.1" height="0.1" depth="0.05" color="grey"></a-box>
+                <a-box position="0.1 0 0.275" width="0.1" height="0.1" depth="0.05" color="grey"></a-box>
+            </a-box>
+        </a-plane>
+
+        <!-- Table 1 / Voorbeeld -->
+        <a-entity position="-1.5 0 -2" scale="0.0625 0.0625 0.0625" color="brown">
+            <a-box scale="16 0.5 10" position="0 15.751 0" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="-7 8 4" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="-7 8 -4" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="7 8 4" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="7 8 -4" material="color: #993300;"></a-box>
+        </a-entity>
+
+        <!-- Table 2 -->
+        <a-entity position="0 0 -2" scale="0.0625 0.0625 0.0625" color="brown">
+            <a-box scale="16 0.5 10" position="0 15.751 0" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="-7 8 4" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="-7 8 -4" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="7 8 4" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="7 8 -4" material="color: #993300;"></a-box>
+        </a-entity>
+
+        <!--Table 3 / Werkstuk -->
+        <a-entity position="2 0 -1.5" scale="0.0625 0.0625 0.0625" rotation="0 90 0" color="brown">
+            <a-box scale="65 0.5 10" position="-24 15.751 0" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="-55 8 4" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="-55 8 -4" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="7 8 4" material="color: #993300;"></a-box>
+            <a-box scale="1 16 1" position="7 8 -4" material="color: #993300;"></a-box>
+        </a-entity>
+
+        <!-- Voorbeeld insectenhotel -->
+        <!-- Vorm hotel -->
+        <a-entity position="-1.5 1 -2" rotation="0 0 0" scale="0.0625 0.0625 0.0625" class="voorbeeld">
+            <!-- Planken -->
+            <a-box position=" 0    0.25 0   " rotation="0  0  0" scale=" 8    0.5  2   " color="#CBB255"></a-box>
+            <a-box position="-4.25 5    0   " rotation="0  0 90" scale="10    0.5  2   " color="#CBB255"></a-box>
+            <a-box position=" 4.25 5    0   " rotation="0  0 90" scale="10    0.5  2   " color="#CBB255"></a-box>
+            <a-box position=" 0    9.75 0   " rotation="0  0  0" scale=" 8    0.5  2   " color="#CBB255"></a-box>
+            <a-box position=" 0    5    0   " rotation="0  0  0" scale=" 8    0.5  2   " color="#CBB255"></a-box>
+            <a-box position=" 0    7.50 0   " rotation="0  0 90" scale=" 5    0.5  2   " color="#CBB255"></a-box>
+
+            <!-- Achterplaat-->
+            <a-box position=" 0    5   -1.05" rotation="0 90 90" scale="10    0.1  9   " color="#CBB255"></a-box>
+
+            <!-- Inhoud vakjes -->
+            <a-box position="-2.125 6.3125 -0.1"                 scale=" 3.75 2.125 1.8" src="#insect"      ></a-box>
+            <a-box position="-2.125 8.4375 -0.1"                 scale=" 3.75 2.125 1.8" src="#bamboe"      ></a-box>
+            <a-box position=" 2.125 7.375  -0.1"                 scale=" 3.75 4.25 1.8 " src="#hout"        ></a-box>
+            <a-box position=" 0     2.625  -0.1"                 scale=" 8    4.25 1.8 " src="#dennenappels"></a-box>
+
+            <!-- Geknipt gaas -->
+            <a-entity position="-4 0.225 0.6" rotation="0 90 90" scale="16 16 16">
+                <a-box position="0.25 0.01 0.25" rotation="0 0  0" scale="0.02 0.02 0.5" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.25" rotation="0 0  0" scale="0.02 0.02 0.5" color="#aeaeae"></a-box>
+                <a-box position="0.05 0.01 0.25" rotation="0 0  0" scale="0.02 0.02 0.5" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.05" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.15" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.25" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.35" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.45" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+            </a-entity>
+
+            <!-- Spijkers links -->
+            <a-entity position="-3.3  0.25 0  "                   ><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+            <a-entity position="-3.3  5    0  "                   ><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+            <a-entity position="-3.3  9.75 0  "                   ><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+
+            <!-- Spijkers rechts -->
+            <a-entity position=" 3.3  0.25 0  " rotation="0 0 180"><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+            <a-entity position=" 3.3  5    0  " rotation="0 0 180"><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+            <a-entity position=" 3.3  9.75 0  " rotation="0 0 180"><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+            <!-- Spijkers achter -->
+            <a-entity position="-4.25 0.25 0.1" rotation="0 -90 0"><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+            <a-entity position=" 4.25 0.25 0.1" rotation="0 -90 0"><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+            <a-entity position="-4.25 9.75 0.1" rotation="0 -90 0"><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+            <a-entity position=" 4.25 9.75 0.1" rotation="0 -90 0"><a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box></a-entity>
+
+        </a-entity>
+
+        <!-- Werkstuk -->
+        <a-entity position="2 1 -1.5" rotation="0 -90 0" scale="0.0625 0.0625 0.0625">
+            <a-box id="js--plank1" position="1 0.25 0" rotation="0 0 0" scale="10 0.5 2" material="color: #CBB255;"></a-box>
+            <a-entity position="4 0.25 0">
+                <a-box
+                    id="js--zaagselect1"
+                    scale="1 0.8 2.3"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+
+            <a-box id="js--plank2" position="-4.25 5 0" rotation="0 0 90" scale="10 0.5 2" material="color: #CBB255;"></a-box>
+
+            <a-box id="js--plank3" position="13 0.25 0" rotation="0 0 0" scale="10 0.5 2" material="color: #CBB255;"></a-box>
+            <a-entity class="zaagpos" visible="false" position="16 0.25 0">
+                <a-box
+                    id="js--zaagselect3"
+                    scale="1 0.8 2.3"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+            <a-box
+                position="-4.25 5 0"
+                id="js--plankselect3"
+                scale="1 0.8 2.3"
+                mixin="highlight"
+            ></a-box>
+
+            <a-box id="js--plank4" position="44 5 0" rotation="0 0 90" scale="10 0.5 2" material="color: #CBB255;"></a-box>
+            <a-box
+                position="4.25 0.25 0"
+                id="js--plankselect4"
+                scale="1 0.8 2.3"
+                mixin="highlight"
+            ></a-box>
+
+            <a-box id="js--plank5" position="37    0.25   -2.5" rotation="0 0  0" scale="10 0.5 2" material="color: #CBB255;"></a-box>
+            <a-entity class="zaagpos" visible="false" position="37.3 0.25 -2.5">
+                <a-box
+                    id="js--zaagselect5"
+                    scale="1 0.8 2.3"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+            <a-box
+                position="0 5 0"
+                id="js--plankselect5"
+                scale="1 0.8 2.3"
+                mixin="highlight"
+            ></a-box>
+
+            <a-box id="js--plank6" position="37    0.25    2.5" rotation="0 0  0" scale="10 0.5 2" material="color: #CBB255;"></a-box>
+            <a-entity class="zaagpos" visible="false" position="40 0.25 2.5">
+                <a-box
+                    id="js--zaagselect6"
+                    scale="1 0.8 2.3"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+            <a-entity >
+            <a-box
+                position="-4.25 10 0"
+                id="js--plankselect6"
+                scale="1 0.8 2.3"
+                mixin="highlight"
+            ></a-box>
+
+            <a-entity id="js--spijker" class="spijker" position="-4.5 0.25 0" visible="false">
+                <a-box position="-0.6 0 0" scale="1.2 0.15 0.15" material="color: #959595;"></a-box>
+                <a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box>
+                <a-box
+                    id="js--spijkerselect0"
+                    position="-0.25 0 0" rotation="0 0 0" scale="0.5 0.5 0.5"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+
+            <a-entity id="js--spijker1" class="spijker" position="4.5 0.25 0" rotation="180 180 0" visible="false">
+                <a-box position="-0.6 0 0" scale="1.2 0.15 0.15" material="color: #959595;"></a-box>
+                <a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box>
+                <a-box
+                    id="js--spijkerselect1"
+                    position="-0.25 0 0" rotation="0 0 0" scale="0.5 0.5 0.5"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+
+            <a-entity id="js--spijker2" class="spijker" position="-4.5 5 0" visible="false">
+                <a-box position="-0.6 0 0" scale="1.2 0.15 0.15" material="color: #959595;"></a-box>
+                <a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box>
+                <a-box
+                    id="js--spijkerselect2"
+                    position="-0.25 0 0" rotation="0 0 0" scale="0.5 0.5 0.5"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+
+            <a-entity id="js--spijker3" class="spijker" position="4.5 5 0" rotation="180 180 0" visible="false">
+                <a-box position="-0.6 0 0" scale="1.2 0.15 0.15" material="color: #959595;"></a-box>
+                <a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box>
+                <a-box
+                    id="js--spijkerselect3"
+                    position="-0.25 0 0" rotation="0 0 0" scale="0.5 0.5 0.5"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+
+            <a-entity id="js--spijker4" class="spijker" position="-4.5 9.75 0" visible="false">
+                <a-box position="-0.6 0 0" scale="1.2 0.15 0.15" material="color: #959595;"></a-box>
+                <a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box>
+                <a-box
+                    id="js--spijkerselect4"
+                    position="-0.25 0 0" rotation="0 0 0" scale="0.5 0.5 0.5"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+
+            <a-entity id="js--spijker5" class="spijker" position="4.5 9.75 0" rotation="180 180 0" visible="false">
+                <a-box position="-0.6 0 0" scale="1.2 0.15 0.15" material="color: #959595;"></a-box>
+                <a-box position="-1.25 0 0" scale="0.1 0.5 0.5" material="color: #959595;"></a-box>
+                <a-box
+                    id="js--spijkerselect5"
+                    position="-0.25 0 0" rotation="0 0 0" scale="0.5 0.5 0.5"
+                    mixin="highlight"
+                ></a-box>
+            </a-entity>
+            <a-box
+                id="js--kniptangselect2"
+                position="-4.8 2.5 1" rotation="0 90 0" scale="0.5 5 0.7"
+                mixin="highlight"
+            ></a-box>
+
+            <a-entity id="js--gaas" position="20 0 2.4" rotation="0 90 0" scale="16 16 16">
+                <a-box position="0.25 0.01 0.35" rotation="0 0  0" scale="0.02 0.02 0.7" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.35" rotation="0 0  0" scale="0.02 0.02 0.7" color="#aeaeae"></a-box>
+                <a-box position="0.05 0.01 0.35" rotation="0 0  0" scale="0.02 0.02 0.7" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.05" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.15" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.25" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.35" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.45" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.55" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-box position="0.15 0.01 0.65" rotation="0 90 0" scale="0.02 0.02 0.3" color="#aeaeae"></a-box>
+                <a-entity class="gaaspos" visible="false">
+                    <a-box
+                        id="js--kniptangselect"
+                        position="0.15 0.01 0.5" rotation="0 0 0" scale="0.3 0.025 0.025"
+                        animation="property: color; from: #000000; to: #FFFFFF; dur: 1000; dir: alternate; easing: easeInOutSine; loop: true"
+                        visible="false"
+                    ></a-box>
+                </a-entity>
+            </a-entity>
+        </a-entity>
+
+    </a-scene>
+</body>
+</html>
